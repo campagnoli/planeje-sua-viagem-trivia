@@ -97,9 +97,34 @@
   <script>
     let malhaDados = null;
 
-    // Popula os selects agrupados por cada linha da malha
+    // Popula os selects priorizando as Linhas 11, 12 e 13 da Trivia Trens
     function preencherSelect(selectElement, dados) {
-      dados.linhas.forEach(linha => {
+      const linhasTriviaIds = ["L11", "L12", "L13"];
+
+      // Separa linhas da Trivia e demais linhas
+      const linhasTrivia = dados.linhas.filter(l => linhasTriviaIds.includes(l.id));
+      const outrasLinhas = dados.linhas.filter(l => !linhasTriviaIds.includes(l.id));
+
+      // Ordena as da Trivia: 11, 12 e depois 13
+      linhasTrivia.sort((a, b) => linhasTriviaIds.indexOf(a.id) - linhasTriviaIds.indexOf(b.id));
+
+      // 1. Renderiza primeiro as linhas da Trivia Trens no topo
+      linhasTrivia.forEach(linha => {
+        const grupo = document.createElement('optgroup');
+        grupo.label = `${linha.nome} — Estações administradas pela Trivia Trens`;
+
+        linha.estacoes.forEach(estacao => {
+          const option = document.createElement('option');
+          option.value = estacao;
+          option.textContent = estacao;
+          grupo.appendChild(option);
+        });
+
+        selectElement.appendChild(grupo);
+      });
+
+      // 2. Renderiza as demais linhas da rede integrada
+      outrasLinhas.forEach(linha => {
         const grupo = document.createElement('optgroup');
         grupo.label = linha.nome;
 
