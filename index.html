@@ -97,41 +97,36 @@
   <script>
     let malhaDados = null;
 
-    // Popula os selects priorizando as Linhas 11, 12 e 13 da Trivia Trens
     function preencherSelect(selectElement, dados) {
       const linhasTriviaIds = ["L11", "L12", "L13"];
 
-      // Separa linhas da Trivia e demais linhas
       const linhasTrivia = dados.linhas.filter(l => linhasTriviaIds.includes(l.id));
       const outrasLinhas = dados.linhas.filter(l => !linhasTriviaIds.includes(l.id));
 
-      // Ordena as da Trivia: 11, 12 e depois 13
       linhasTrivia.sort((a, b) => linhasTriviaIds.indexOf(a.id) - linhasTriviaIds.indexOf(b.id));
 
-      // 1. Renderiza primeiro as linhas da Trivia Trens no topo
       linhasTrivia.forEach(linha => {
         const grupo = document.createElement('optgroup');
         grupo.label = `${linha.nome} — Estações administradas pela Trivia Trens`;
 
         linha.estacoes.forEach(estacao => {
           const option = document.createElement('option');
-          option.value = estacao;
-          option.textContent = estacao;
+          option.value = estacao.trim();
+          option.textContent = estacao.trim();
           grupo.appendChild(option);
         });
 
         selectElement.appendChild(grupo);
       });
 
-      // 2. Renderiza as demais linhas da rede integrada
       outrasLinhas.forEach(linha => {
         const grupo = document.createElement('optgroup');
         grupo.label = linha.nome;
 
         linha.estacoes.forEach(estacao => {
           const option = document.createElement('option');
-          option.value = estacao;
-          option.textContent = estacao;
+          option.value = estacao.trim();
+          option.textContent = estacao.trim();
           grupo.appendChild(option);
         });
 
@@ -140,7 +135,10 @@
     }
 
     fetch('malha.json')
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error(`HTTP status ${res.status}`);
+        return res.json();
+      })
       .then(dados => {
         malhaDados = dados;
         const selOrigem = document.getElementById('origem');
@@ -151,7 +149,7 @@
       })
       .catch(err => {
         document.getElementById('resultado').innerHTML = 
-          `<p style="color: red;">Erro ao carregar o arquivo malha.json: ${err.message}</p>`;
+          `<p style="color: red;"><b>Erro ao carregar o arquivo malha.json:</b> ${err.message}. Verifique se o arquivo está na mesma pasta do index.html.</p>`;
       });
 
     document.getElementById('btnBuscar').addEventListener('click', () => {
@@ -162,54 +160,62 @@
       const origem = selOrigem.value;
       const destino = selDestino.value;
 
+      if (!malhaDados) {
+        container.innerHTML = '<p style="color: red;">Aguarde, os dados da malha ainda estão sendo carregados...</p>';
+        return;
+      }
+
       if (!origem || !destino) {
         container.innerHTML = '<p style="color: #c00;">Por favor, selecione uma estação de origem e uma de destino.</p>';
         return;
       }
 
-      const rota = planejarViagem(origem, destino, malhaDados);
-      container.innerHTML = '';
+      try {
+        const rota = planejarViagem(origem, destino, malhaDados);
+        container.innerHTML = '';
 
-      if (rota.erro) {
-        container.innerHTML = `<p style="color: red;">${rota.erro}</p>`;
-        return;
-      }
-
-      // Card de resumo
-      const resumoDiv = document.createElement('div');
-      resumoDiv.className = 'resumo';
-      const baldeacoesTexto = rota.totalBaldeacoes === 0 
-        ? 'Viagem direta (sem baldeações)' 
-        : `${rota.totalBaldeacoes} baldeação(ões)`;
-      resumoDiv.textContent = `${origem} ➔ ${destino} (${baldeacoesTexto})`;
-      container.appendChild(resumoDiv);
-
-      // Renderização passo a passo
-      rota.instrucoes.forEach(passo => {
-        const div = document.createElement('div');
-        div.className = 'passo';
-        div.style.borderColor = passo.corLinha || '#333';
-
-        if (passo.acao === 'EMBARQUE') {
-          div.innerHTML = `
-            <div><strong>Embarque:</strong> Estação <b>${passo.estacao}</b> na <b>${passo.linha}</b></div>
-            ${passo.sentido ? `<div class="badge-sentido">Sentido ${passo.sentido}</div>` : ''}
-          `;
-        } else if (passo.acao === 'BALDEACAO') {
-          div.innerHTML = `
-            <div><strong>Transferência:</strong> Em <b>${passo.estacao}</b>, desça da <i>${passo.descerDaLinha}</i> e pegue a <b>${passo.pegarLinha}</b></div>
-            ${passo.sentido ? `<div class="badge-sentido">Sentido ${passo.sentido}</div>` : ''}
-            ${passo.estacoesPercorridasTrechoAnterior ? `<div class="paradas-info">(${passo.estacoesPercorridasTrechoAnterior} estações no trecho anterior)</div>` : ''}
-          `;
-        } else if (passo.acao === 'DESEMBARQUE') {
-          div.innerHTML = `
-            <div><strong>Desembarque:</strong> Estação final <b>${passo.estacao}</b> (${passo.linha})</div>
-            ${passo.estacoesPercorridasTrechoAnterior ? `<div class="paradas-info">(${passo.estacoesPercorridasTrechoAnterior} estações no último trecho)</div>` : ''}
-          `;
+        if (rota.erro) {
+          container.innerHTML = `<p style="color: red;">${rota.erro}</p>`;
+          return;
         }
 
-        container.appendChild(div);
-      });
+        const resumoDiv = document.createElement('div');
+        resumoDiv.className = 'resumo';
+        const baldeacoesTexto = rota.totalBaldeacoes === 0 
+          ? 'Viagem direta (sem baldeações)' 
+          : `${rota.totalBaldeacoes} baldeação(ões)`;
+        resumoDiv.textContent = `${origem} ➔ ${destino} (${baldeacoesTexto})`;
+        container.appendChild(resumoDiv);
+
+        rota.instrucoes.forEach(passo => {
+          const div = document.createElement('div');
+          div.className = 'passo';
+          div.style.borderColor = passo.corLinha || '#333';
+
+          if (passo.acao === 'EMBARQUE') {
+            div.innerHTML = `
+              <div><strong>Embarque:</strong> Estação <b>${passo.estacao}</b> na <b>${passo.linha}</b></div>
+              ${passo.sentido ? `<div class="badge-sentido">Sentido ${passo.sentido}</div>` : ''}
+            `;
+          } else if (passo.acao === 'BALDEACAO') {
+            div.innerHTML = `
+              <div><strong>Transferência:</strong> Em <b>${passo.estacao}</b>, desça da <i>${passo.descerDaLinha}</i> e pegue a <b>${passo.pegarLinha}</b></div>
+              ${passo.sentido ? `<div class="badge-sentido">Sentido ${passo.sentido}</div>` : ''}
+              ${passo.estacoesPercorridasTrechoAnterior ? `<div class="paradas-info">(${passo.estacoesPercorridasTrechoAnterior} estações no trecho anterior)</div>` : ''}
+            `;
+          } else if (passo.acao === 'DESEMBARQUE') {
+            div.innerHTML = `
+              <div><strong>Desembarque:</strong> Estação final <b>${passo.estacao}</b> (${passo.linha})</div>
+              ${passo.estacoesPercorridasTrechoAnterior ? `<div class="paradas-info">(${passo.estacoesPercorridasTrechoAnterior} estações no último trecho)</div>` : ''}
+            `;
+          }
+
+          container.appendChild(div);
+        });
+      } catch (e) {
+        console.error(e);
+        container.innerHTML = `<p style="color: red;">Erro ao processar a rota: ${e.message}</p>`;
+      }
     });
   </script>
 </body>
