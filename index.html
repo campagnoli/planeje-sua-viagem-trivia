@@ -13,25 +13,47 @@
       color: #222; 
     }
     h2 { margin-bottom: 24px; color: #1a1a1a; font-weight: 600; }
-    .campo { margin-bottom: 18px; }
+    .campo { margin-bottom: 22px; }
     label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px; color: #444; }
-    input, button { 
-      width: 100%; 
-      padding: 12px; 
-      font-size: 15px; 
-      border-radius: 6px; 
-      border: 1px solid #ccc; 
+    
+    .input-filtro {
+      width: 100%;
+      padding: 9px 12px;
+      font-size: 14px;
+      border: 1px solid #d0d0d0;
+      border-radius: 6px 6px 0 0;
       box-sizing: border-box;
-    }
-    input { 
-      background-color: #fff; 
+      background-color: #fafafa;
       outline: none;
-      transition: border-color 0.2s;
     }
-    input:focus {
+    .input-filtro:focus {
+      border-color: #008287;
+      background-color: #fff;
+    }
+
+    select { 
+      width: 100%; 
+      padding: 11px 12px; 
+      font-size: 15px; 
+      border-radius: 0 0 6px 6px; 
+      border: 1px solid #ccc; 
+      border-top: none;
+      box-sizing: border-box;
+      background-color: #fff;
+      outline: none;
+    }
+    select:focus {
       border-color: #008287;
     }
+    
+    optgroup { font-weight: bold; font-size: 13px; color: #333; }
+    option { font-weight: normal; font-size: 14px; padding: 4px; color: #222; }
+
     button { 
+      width: 100%;
+      padding: 12px;
+      font-size: 15px;
+      border-radius: 6px;
       background-color: #008287; 
       color: white; 
       border: none; 
@@ -102,31 +124,32 @@
   <h2>Planeje sua Viagem</h2>
 
   <div class="campo">
-    <label for="origem">Estação de Origem:</label>
+    <label for="filtro-origem">Estação de Origem:</label>
     <input 
       type="text" 
-      id="origem" 
-      list="lista-estacoes" 
-      placeholder="Digite ou selecione a estação de origem..." 
-      disabled 
-      autocomplete="off"
+      id="filtro-origem" 
+      class="input-filtro" 
+      placeholder="Digite para filtrar a estação de origem..." 
+      disabled
     >
+    <select id="origem" disabled>
+      <option value="" disabled selected>Carregando estações...</option>
+    </select>
   </div>
 
   <div class="campo">
-    <label for="destino">Estação de Destino:</label>
+    <label for="filtro-destino">Estação de Destino:</label>
     <input 
       type="text" 
-      id="destino" 
-      list="lista-estacoes" 
-      placeholder="Digite ou selecione a estação de destino..." 
-      disabled 
-      autocomplete="off"
+      id="filtro-destino" 
+      class="input-filtro" 
+      placeholder="Digite para filtrar a estação de destino..." 
+      disabled
     >
+    <select id="destino" disabled>
+      <option value="" disabled selected>Carregando estações...</option>
+    </select>
   </div>
-
-  <!-- Datalist compartilhado que alimenta os dois campos com busca e autocomplete -->
-  <datalist id="lista-estacoes"></datalist>
 
   <button id="btnBuscar" disabled>Carregando malha...</button>
 
@@ -138,15 +161,15 @@
 
   <script>
     let malhaDados = null;
-    const inpOrigem = document.getElementById('origem');
-    const inpDestino = document.getElementById('destino');
-    const dataList = document.getElementById('lista-estacoes');
+    const filtroOrigem = document.getElementById('filtro-origem');
+    const filtroDestino = document.getElementById('filtro-destino');
+    const selOrigem = document.getElementById('origem');
+    const selDestino = document.getElementById('destino');
     const btnBuscar = document.getElementById('btnBuscar');
     const containerResultado = document.getElementById('containerResultado');
 
-    // Popula o datalist priorizando as linhas da Trivia Trens
-    function preencherDatalist(dlElement, dados) {
-      dlElement.innerHTML = '';
+    function preencherSelect(selectElement, dados) {
+      selectElement.innerHTML = '<option value="" disabled selected>Selecione uma estação...</option>';
       const linhasTriviaIds = ["L11", "L12", "L13"];
 
       const linhasTrivia = dados.linhas.filter(l => linhasTriviaIds.includes(l.id));
@@ -154,24 +177,62 @@
 
       linhasTrivia.sort((a, b) => linhasTriviaIds.indexOf(a.id) - linhasTriviaIds.indexOf(b.id));
 
-      // 1. Estações da Trivia Trens no topo
+      // 1. Linhas da Trivia Trens no topo
       linhasTrivia.forEach(linha => {
+        const grupo = document.createElement('optgroup');
+        grupo.label = `${linha.nome} — Estações administradas pela Trivia Trens`;
         linha.estacoes.forEach(estacao => {
-          const opt = document.createElement('option');
-          opt.value = estacao.trim();
-          opt.label = `${linha.nome} (Trivia Trens)`;
-          dlElement.appendChild(opt);
+          const option = document.createElement('option');
+          option.value = estacao.trim();
+          option.textContent = estacao.trim();
+          grupo.appendChild(option);
         });
+        selectElement.appendChild(grupo);
       });
 
-      // 2. Demais estações da malha integrada
+      // 2. Demais linhas
       outrasLinhas.forEach(linha => {
+        const grupo = document.createElement('optgroup');
+        grupo.label = linha.nome;
         linha.estacoes.forEach(estacao => {
-          const opt = document.createElement('option');
-          opt.value = estacao.trim();
-          opt.label = linha.nome;
-          dlElement.appendChild(opt);
+          const option = document.createElement('option');
+          option.value = estacao.trim();
+          option.textContent = estacao.trim();
+          grupo.appendChild(option);
         });
+        selectElement.appendChild(grupo);
+      });
+    }
+
+    // Função de filtro em tempo real sem desmontar os optgroups
+    function configurarFiltro(inputElement, selectElement) {
+      inputElement.addEventListener('input', () => {
+        const termo = inputElement.value.trim().toLowerCase();
+        const grupos = selectElement.querySelectorAll('optgroup');
+        let primeiroVisivel = null;
+
+        grupos.forEach(grupo => {
+          let temOpcaoVisivelNoGrupo = false;
+          const opcoes = grupo.querySelectorAll('option');
+
+          opcoes.forEach(opcao => {
+            const texto = opcao.textContent.toLowerCase();
+            const visivel = termo === '' || texto.includes(termo);
+            opcao.hidden = !visivel;
+            if (visivel) {
+              temOpcaoVisivelNoGrupo = true;
+              if (!primeiroVisivel) primeiroVisivel = opcao;
+            }
+          });
+
+          // Oculta o título da linha se nenhuma estação dela bater com a busca
+          grupo.hidden = !temOpcaoVisivelNoGrupo;
+        });
+
+        // Se o usuário digitou algo e houver resultado, seleciona a primeira estação compatível
+        if (termo && primeiroVisivel) {
+          selectElement.value = primeiroVisivel.value;
+        }
       });
     }
 
@@ -182,10 +243,16 @@
       })
       .then(dados => {
         malhaDados = dados;
-        preencherDatalist(dataList, malhaDados);
+        preencherSelect(selOrigem, malhaDados);
+        preencherSelect(selDestino, malhaDados);
 
-        inpOrigem.disabled = false;
-        inpDestino.disabled = false;
+        configurarFiltro(filtroOrigem, selOrigem);
+        configurarFiltro(filtroDestino, selDestino);
+
+        filtroOrigem.disabled = false;
+        filtroDestino.disabled = false;
+        selOrigem.disabled = false;
+        selDestino.disabled = false;
         btnBuscar.disabled = false;
         btnBuscar.textContent = "Calcular Rota";
       })
@@ -195,11 +262,11 @@
       });
 
     btnBuscar.addEventListener('click', () => {
-      const origem = inpOrigem.value.trim();
-      const destino = inpDestino.value.trim();
+      const origem = selOrigem.value;
+      const destino = selDestino.value;
 
       if (!origem || !destino) {
-        containerResultado.innerHTML = '<p style="color: #c00;">Por favor, digite ou selecione a estação de origem e de destino.</p>';
+        containerResultado.innerHTML = '<p style="color: #c00;">Por favor, selecione uma estação de origem e uma de destino.</p>';
         return;
       }
 
@@ -255,7 +322,7 @@
           timeline.appendChild(item);
 
         } else if (passo.acao === 'BALDEACAO') {
-          // Desembarque na estação de integração
+          // Desembarque na estação de transferência
           const itemDesembarque = document.createElement('div');
           itemDesembarque.className = 'timeline-item';
           itemDesembarque.innerHTML = `
@@ -272,7 +339,7 @@
           // Atualiza para a cor da linha seguinte
           corAtual = passo.corLinha;
 
-          // Transferência
+          // Transferência para a nova linha
           const itemTransferencia = document.createElement('div');
           itemTransferencia.className = 'timeline-item';
           itemTransferencia.innerHTML = `
