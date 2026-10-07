@@ -3,23 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Planeie a sua Viagem - Trivia Trens</title>
+  <title>Planeje sua Viagem - Trivia Trens</title>
   <style>
     body { 
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-      max-width: 640px; 
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; 
+      max-width: 680px; 
       margin: 40px auto; 
       padding: 0 20px; 
       color: #333; 
     }
-    h2 { margin-bottom: 24px; color: #1a1a1a; }
+    h2 { margin-bottom: 24px; color: #1a1a1a; font-weight: 600; }
     .campo { margin-bottom: 18px; }
-    label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px; }
+    label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px; color: #444; }
     select, button { 
       width: 100%; 
       padding: 12px; 
       font-size: 15px; 
-      border-radius: 8px; 
+      border-radius: 6px; 
       border: 1px solid #ccc; 
       box-sizing: border-box;
     }
@@ -35,40 +35,63 @@
       margin-top: 8px; 
       transition: background 0.2s, opacity 0.2s;
     }
-    button:disabled {
-      background-color: #999;
-      cursor: not-allowed;
-    }
+    button:disabled { background-color: #999; cursor: not-allowed; }
     button:hover:not(:disabled) { background-color: #006b6f; }
     
-    .resultado-container { margin-top: 32px; }
-    .resumo { 
-      background: #eef7f7; 
-      border-left: 4px solid #008287; 
-      padding: 10px 14px; 
-      margin-bottom: 16px; 
-      font-weight: 600; 
+    /* Layout idêntico ao da imagem */
+    .resultado-container { margin-top: 36px; }
+    .titulo-viagem {
+      font-size: 22px;
+      font-weight: 400;
+      color: #222;
+      margin-bottom: 6px;
     }
-    .passo { 
-      border-left: 5px solid #ccc; 
-      padding: 10px 14px; 
-      margin-bottom: 10px; 
-      background: #fafafa; 
-      border-radius: 0 6px 6px 0; 
+    .titulo-viagem b {
+      font-weight: 600;
     }
-    .badge-sentido {
+    .resumo-sub {
+      font-size: 16px;
+      color: #555;
+      margin-bottom: 24px;
+    }
+
+    /* Linha do tempo vertical */
+    .timeline {
+      display: flex;
+      flex-direction: column;
+    }
+    .timeline-item {
+      display: flex;
+      align-items: stretch;
+      min-height: 48px;
+    }
+    .timeline-barra {
+      width: 32px;
+      min-width: 32px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .timeline-ponto {
+      width: 10px;
+      height: 10px;
+      background-color: #fff;
+      border-radius: 50%;
+      z-index: 2;
+    }
+    .timeline-texto {
+      padding: 12px 0 12px 14px;
+      font-size: 15px;
+      line-height: 1.4;
+      color: #222;
+      display: flex;
+      align-items: center;
+    }
+    .timeline-texto .icone {
+      font-size: 16px;
+      margin-right: 8px;
       display: inline-block;
-      margin-top: 4px;
-      padding: 2px 8px;
-      font-size: 12px;
-      background: #eee;
-      border-radius: 4px;
-      color: #444;
-    }
-    .paradas-info {
-      font-size: 12px;
-      color: #777;
-      margin-top: 4px;
     }
     .status-msg {
       padding: 12px;
@@ -84,30 +107,28 @@
 </head>
 <body>
 
-  <h2>Planeie a sua Viagem</h2>
+  <h2>Planeje sua Viagem</h2>
 
   <div class="campo">
     <label for="origem">Estação de Origem:</label>
     <select id="origem" disabled>
-      <option value="" disabled selected>A carregar estações...</option>
+      <option value="" disabled selected>Carregando estações...</option>
     </select>
   </div>
 
   <div class="campo">
     <label for="destino">Estação de Destino:</label>
     <select id="destino" disabled>
-      <option value="" disabled selected>A carregar estações...</option>
+      <option value="" disabled selected>Carregando estações...</option>
     </select>
   </div>
 
-  <button id="btnBuscar" disabled>A carregar malha...</button>
+  <button id="btnBuscar" disabled>Carregando malha...</button>
 
-  <div class="resultado-container">
-    <h3>Itinerário:</h3>
-    <div id="resultado">A carregar a base de dados da malha...</div>
+  <div class="resultado-container" id="containerResultado">
+    <div style="color: #666;">Escolha a origem e o destino para visualizar as instruções de viagem.</div>
   </div>
 
-  <!-- Carrega a lógica de cálculo do ficheiro roteador.js -->
   <script src="roteador.js"></script>
 
   <script>
@@ -115,7 +136,7 @@
     const selOrigem = document.getElementById('origem');
     const selDestino = document.getElementById('destino');
     const btnBuscar = document.getElementById('btnBuscar');
-    const containerResultado = document.getElementById('resultado');
+    const containerResultado = document.getElementById('containerResultado');
 
     function preencherSelect(selectElement, dados) {
       selectElement.innerHTML = '<option value="" disabled selected>Selecione uma estação...</option>';
@@ -126,7 +147,7 @@
 
       linhasTrivia.sort((a, b) => linhasTriviaIds.indexOf(a.id) - linhasTriviaIds.indexOf(b.id));
 
-      // 1. Linhas da Trivia no topo
+      // 1. Linhas da Trivia Trens
       linhasTrivia.forEach(linha => {
         const grupo = document.createElement('optgroup');
         grupo.label = `${linha.nome} — Estações administradas pela Trivia Trens`;
@@ -141,7 +162,7 @@
         selectElement.appendChild(grupo);
       });
 
-      // 2. Demais linhas integradas
+      // 2. Demais linhas
       outrasLinhas.forEach(linha => {
         const grupo = document.createElement('optgroup');
         grupo.label = linha.nome;
@@ -157,21 +178,13 @@
       });
     }
 
-    // Leitura direta do malha.json com supressão de cache
     fetch('malha.json?v=' + new Date().getTime())
       .then(res => {
-        if (!res.ok) {
-          throw new Error(`Não foi possível descarregar o ficheiro malha.json (Erro HTTP: ${res.status}).`);
-        }
+        if (!res.ok) throw new Error(`Erro ao baixar malha.json (HTTP ${res.status})`);
         return res.json();
       })
       .then(dados => {
-        if (!dados.linhas || !Array.isArray(dados.linhas)) {
-          throw new Error('A estrutura do ficheiro malha.json não contém a chave "linhas" válida.');
-        }
-
         malhaDados = dados;
-
         preencherSelect(selOrigem, malhaDados);
         preencherSelect(selDestino, malhaDados);
 
@@ -179,21 +192,17 @@
         selDestino.disabled = false;
         btnBuscar.disabled = false;
         btnBuscar.textContent = "Calcular Rota";
-
-        containerResultado.textContent = "Escolha a origem e o destino para visualizar as instruções.";
       })
       .catch(err => {
-        console.error("Falha ao carregar malha.json:", err);
         btnBuscar.textContent = "Erro ao carregar dados";
         containerResultado.innerHTML = `
           <div class="status-msg erro-box">
-            <b>Falha na leitura de dados:</b> ${err.message}<br><br>
-            <i>Certifique-se de que o ficheiro <code>malha.json</code> se encontra exatamente na mesma pasta do <code>index.html</code> no repositório.</i>
+            <b>Falha na leitura dos dados:</b> ${err.message}<br>
+            <i>Verifique se o arquivo <code>malha.json</code> está presente na raiz do repositório.</i>
           </div>
         `;
       });
 
-    // Ação de cálculo
     btnBuscar.addEventListener('click', () => {
       const origem = selOrigem.value;
       const destino = selDestino.value;
@@ -204,7 +213,7 @@
       }
 
       if (typeof planejarViagem !== 'function') {
-        containerResultado.innerHTML = '<p style="color: red;">O ficheiro <code>roteador.js</code> não foi carregado corretamente.</p>';
+        containerResultado.innerHTML = '<p style="color: red;">O arquivo <code>roteador.js</code> não foi carregado corretamente.</p>';
         return;
       }
 
@@ -216,39 +225,92 @@
         return;
       }
 
-      const resumoDiv = document.createElement('div');
-      resumoDiv.className = 'resumo';
+      // Linha de partida e chegada
+      const primeiraInstrucao = rota.instrucoes[0];
+      const ultimaInstrucao = rota.instrucoes[rota.instrucoes.length - 1];
+
+      // Cabeçalho idêntico à imagem
+      const headerDiv = document.createElement('div');
+      headerDiv.className = 'titulo-viagem';
+      headerDiv.innerHTML = `${origem} (${primeiraInstrucao.linha}) ➔ ${destino} (${ultimaInstrucao.linha})`;
+      containerResultado.appendChild(headerDiv);
+
+      const subDiv = document.createElement('div');
+      subDiv.className = 'resumo-sub';
       const baldeacoesTexto = rota.totalBaldeacoes === 0 
-        ? 'Viagem direta (sem baldeações)' 
-        : `${rota.totalBaldeacoes} baldeação(ões)`;
-      resumoDiv.textContent = `${origem} ➔ ${destino} (${baldeacoesTexto})`;
-      containerResultado.appendChild(resumoDiv);
+        ? 'Viagem direta (sem transferências)' 
+        : `${rota.totalBaldeacoes} transferência(s)`;
+      subDiv.textContent = `Itinerário: ${baldeacoesTexto}`;
+      containerResultado.appendChild(subDiv);
 
-      rota.instrucoes.forEach(passo => {
-        const div = document.createElement('div');
-        div.className = 'passo';
-        div.style.borderColor = passo.corLinha || '#333';
+      // Linha do tempo contínua
+      const timeline = document.createElement('div');
+      timeline.className = 'timeline';
 
+      let corAtual = primeiraInstrucao.corLinha || '#008287';
+
+      rota.instrucoes.forEach((passo, idx) => {
+        // Quando é baldeação, o primeiro item (desembarque) usa a cor anterior e o segundo (embarque) usa a nova cor
         if (passo.acao === 'EMBARQUE') {
-          div.innerHTML = `
-            <div><strong>Embarque:</strong> Estação <b>${passo.estacao}</b> na <b>${passo.linha}</b></div>
-            ${passo.sentido ? `<div class="badge-sentido">Sentido ${passo.sentido}</div>` : ''}
+          corAtual = passo.corLinha || '#008287';
+          const item = document.createElement('div');
+          item.className = 'timeline-item';
+          item.innerHTML = `
+            <div class="timeline-barra" style="background-color: ${corAtual};">
+              <div class="timeline-ponto"></div>
+            </div>
+            <div class="timeline-texto">
+              <span class="icone">🚶➔</span> Estação <b>${passo.estacao}</b> (${passo.linha}), embarque na plataforma sentido <b>${passo.sentido || 'terminal'}</b>
+            </div>
           `;
-        } else if (passo.acao === 'BALDEACAO') {
-          div.innerHTML = `
-            <div><strong>Transferência:</strong> Em <b>${passo.estacao}</b>, desça da <i>${passo.descerDaLinha}</i> e apanhe a <b>${passo.pegarLinha}</b></div>
-            ${passo.sentido ? `<div class="badge-sentido">Sentido ${passo.sentido}</div>` : ''}
-            ${passo.estacoesPercorridasTrechoAnterior ? `<div class="paradas-info">(${passo.estacoesPercorridasTrechoAnterior} estações no trecho anterior)</div>` : ''}
-          `;
-        } else if (passo.acao === 'DESEMBARQUE') {
-          div.innerHTML = `
-            <div><strong>Desembarque:</strong> Estação terminal <b>${passo.estacao}</b> (${passo.linha})</div>
-            ${passo.estacoesPercorridasTrechoAnterior ? `<div class="paradas-info">(${passo.estacoesPercorridasTrechoAnterior} estações no último trecho)</div>` : ''}
-          `;
-        }
+          timeline.appendChild(item);
 
-        containerResultado.appendChild(div);
+        } else if (passo.acao === 'BALDEACAO') {
+          // 1. Desembarque na estação de transferência
+          const itemDesembarque = document.createElement('div');
+          itemDesembarque.className = 'timeline-item';
+          itemDesembarque.innerHTML = `
+            <div class="timeline-barra" style="background-color: ${corAtual};">
+              <div class="timeline-ponto"></div>
+            </div>
+            <div class="timeline-texto">
+              <span class="icone">↩</span> Desembarque na estação <b>${passo.estacao}</b>
+            </div>
+          `;
+          timeline.appendChild(itemDesembarque);
+
+          // Atualiza para a cor da nova linha
+          corAtual = passo.corLinha || '#97805F';
+
+          // 2. Transferência para a nova linha
+          const itemTransferencia = document.createElement('div');
+          itemTransferencia.className = 'timeline-item';
+          itemTransferencia.innerHTML = `
+            <div class="timeline-barra" style="background-color: ${corAtual};">
+              <div class="timeline-ponto"></div>
+            </div>
+            <div class="timeline-texto">
+              <span class="icone">➔</span> Faça <b>transferência</b> para <b>${passo.pegarLinha}</b>, sentido <b>${passo.sentido || 'terminal'}</b>
+            </div>
+          `;
+          timeline.appendChild(itemTransferencia);
+
+        } else if (passo.acao === 'DESEMBARQUE') {
+          const itemFinal = document.createElement('div');
+          itemFinal.className = 'timeline-item';
+          itemFinal.innerHTML = `
+            <div class="timeline-barra" style="background-color: ${corAtual};">
+              <div class="timeline-ponto"></div>
+            </div>
+            <div class="timeline-texto">
+              <span class="icone">←🚶</span> Desembarque na estação <b>${passo.estacao}</b>
+            </div>
+          `;
+          timeline.appendChild(itemFinal);
+        }
       });
+
+      containerResultado.appendChild(timeline);
     });
   </script>
 </body>
