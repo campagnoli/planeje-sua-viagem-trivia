@@ -1,0 +1,89 @@
+{
+  "linhas": [
+    {
+      "id": "L10",
+      "nome": "Linha 10 - Turquesa",
+      "cor": "#008287",
+      "estacoes": [
+        "Rio Grande da Serra",
+        "Ribeirão Pires",
+        "Guapituba",
+        "Mauá",
+        "Capuava",
+        "Prefeito Celso Daniel - Santo André",
+        "Prefeito Saladino",
+        "Utinga",
+        "São Caetano do Sul",
+        "Tamanduateí",
+        "Ipiranga",
+        "Juventus-Mooca",
+        "Brás",
+        "Luz"
+      ]
+    },
+    {
+      "id": "L3",
+      "nome": "Linha 3 - Vermelha",
+      "cor": "#EE3E34",
+      "estacoes": [
+        "Corinthians-Itaquera",
+        "Tatuapé",
+        "Brás",
+        "Sé",
+        "República",
+        "Palmeiras-Barra Funda"
+      ]
+    },
+    {
+      "id": "L8",
+      "nome": "Linha 8 - Diamante",
+      "cor": "#97805F",
+      "estacoes": [
+        "Júlio Prestes",
+        "Palmeiras-Barra Funda",
+        "Lapa",
+        "Domingos de Moraes",
+        "Imperatriz Leopoldina",
+        "Presidente Altino",
+        "Osasco",
+        "Comandante Sampaio",
+        "Quitaúna",
+        "General Miguel Costa",
+        "Carapicuíba",
+        "Santa Terezinha",
+        "Antônio João",
+        "Barueri",
+        "Jardim Silveira",
+        "Jardim Belval",
+        "Arena Barueri",
+        "Engenheiro Cardoso",
+        "Sagrado Coração",
+        "Itapevi"
+      ]
+    },
+    {
+      "id": "L4",
+      "nome": "Linha 4 - Amarela",
+      "cor": "#FED304",
+      "estacoes": [
+        "Luz",
+        "República",
+        "Paulista",
+        "Pinheiros",
+        "Vila Sônia"
+      ]
+    },
+    {
+      "id": "L9",
+      "nome": "Linha 9 - Esmeralda",
+      "cor": "#00A88F",
+      "estacoes": [
+        "Osasco",
+        "Presidente Altino",
+        "Pinheiros",
+        "Santo Amaro",
+        "Mendes-Vila Natal"
+      ]
+    }
+  ]
+}
