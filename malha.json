@@ -36,7 +36,7 @@
       "cor": "#008060",
       "estacoes": [
         "Vila Madalena",
-        "Sumaré - Santuário Nossa Senhora de Fátima",
+        "Santuário Nossa Senhora de Fátima-Sumaré",
         "Clínicas",
         "Consolação",
         "Trianon-Masp",
@@ -216,7 +216,7 @@
         "Juventus-Mooca",
         "Brás",
         "Luz",
-        "Palmeiras Barra-Funda"
+        "Palmeiras-Barra Funda"
       ]
     },
     {
@@ -224,7 +224,7 @@
       "nome": "Linha 11 - Coral",
       "cor": "#F04E23",
       "estacoes": [
-        "Palmeiras Barra-Funda",
+        "Palmeiras-Barra Funda",
         "Luz",
         "Brás",
         "Tatuapé",
