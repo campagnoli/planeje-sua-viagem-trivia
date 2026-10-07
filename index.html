@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Planeje sua Viagem - Trivia Trens</title>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: 40px auto; padding: 0 20px; }
+    .campo { margin-bottom: 16px; }
+    label { display: block; margin-bottom: 6px; font-weight: bold; }
+    select, button { width: 100%; padding: 10px; font-size: 16px; border-radius: 6px; border: 1px solid #ccc; }
+    button { background-color: #008287; color: white; border: none; cursor: pointer; font-weight: bold; }
+    button:hover { opacity: 0.9; }
+    .passo { border-left: 4px solid #ccc; padding: 8px 12px; margin-bottom: 8px; background: #f9f9f9; }
+  </style>
+</head>
+<body>
+
+  <h2>Planeje sua Viagem</h2>
+
+  <div class="campo">
+    <label for="origem">Estação de Origem:</label>
+    <select id="origem"></select>
+  </div>
+
+  <div class="campo">
+    <label for="destino">Estação de Destino:</label>
+    <select id="destino"></select>
+  </div>
+
+  <button id="btnBuscar">Calcular Rota</button>
+
+  <h3 style="margin-top: 30px;">Roteiro:</h3>
+  <div id="resultado">Selecione as estações acima e clique em Calcular.</div>
+
+  <script src="roteador.js"></script>
+  <script>
+    let malhaDados = null;
+
+    fetch('malha.json')
+      .then(res => res.json())
+      .then(dados => {
+        malhaDados = dados;
+        
+        // Pega lista única de estações ordenada
+        const estacoes = [...new Set(dados.linhas.flatMap(l => l.estacoes))].sort();
+        
+        const selOrigem = document.getElementById('origem');
+        const selDestino = document.getElementById('destino');
+
+        estacoes.forEach(est => {
+          selOrigem.add(new Option(est, est));
+          selDestino.add(new Option(est, est));
+        });
+
+        // Seleções padrão de exemplo
+        selOrigem.value = "Rio Grande da Serra";
+        selDestino.value = "Carapicuíba";
+      });
+
+    document.getElementById('btnBuscar').addEventListener('click', () => {
+      if (!malhaDados) return;
+      const origem = document.getElementById('origem').value;
+      const destino = document.getElementById('destino').value;
+
+      const rota = planejarViagem(origem, destino, malhaDados);
+      const container = document.getElementById('resultado');
+      container.innerHTML = '';
+
+      if (rota.erro) {
+        container.innerHTML = `<p style="color: red;">${rota.erro}</p>`;
+        return;
+      }
+
+      rota.instrucoes.forEach(passo => {
+        const div = document.createElement('div');
+        div.className = 'passo';
+        div.style.borderColor = passo.corLinha || '#333';
+
+        if (passo.acao === 'EMBARQUE') {
+          div.innerHTML = `<strong>Embarque:</strong> Estação <b>${passo.estacao}</b> na <b>${passo.linha}</b>`;
+        } else if (passo.acao === 'BALDEACAO') {
+          div.innerHTML = `<strong>Transferência:</strong> Em <b>${passo.estacao}</b>, desembarque da <i>${passo.descerDaLinha}</i> e pegue a <b>${passo.pegarLinha}</b>`;
+        } else if (passo.acao === 'DESEMBARQUE') {
+          div.innerHTML = `<strong>Destino:</strong> Desembarque em <b>${passo.estacao}</b>`;
+        }
+        container.appendChild(div);
+      });
+    });
+  </script>
+</body>
+</html>
