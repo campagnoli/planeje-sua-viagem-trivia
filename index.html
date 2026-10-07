@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Planeje sua Viagem - Trivia Trens</title>
+  <title>Planeie a sua Viagem - Trivia Trens</title>
   <style>
     body { 
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
@@ -70,7 +70,7 @@
 </head>
 <body>
 
-  <h2>Planeje sua Viagem</h2>
+  <h2>Planeie a sua Viagem</h2>
 
   <div class="campo">
     <label for="origem">Estação de Origem:</label>
@@ -89,17 +89,358 @@
   <button id="btnBuscar">Calcular Rota</button>
 
   <div class="resultado-container">
-    <h3>Roteiro:</h3>
+    <h3>Itinerário:</h3>
     <div id="resultado">Escolha a origem e o destino para visualizar as instruções.</div>
   </div>
 
-  <script src="roteador.js"></script>
   <script>
-    let malhaDados = null;
+    // 1. Dados completos da malha embutidos
+    const malhaDados = {
+      "linhas": [
+        {
+          "id": "L11",
+          "nome": "Linha 11 - Coral",
+          "cor": "#F04E23",
+          "estacoes": [
+            "Luz", "Brás", "Tatuapé", "Corinthians-Itaquera", "Dom Bosco", 
+            "José Bonifácio", "Guaianases", "Antônio Gianetti Neto", 
+            "Ferraz de Vasconcelos", "Poá", "Calmon Viana", "Suzano", 
+            "Jundiapeba", "Brás Cubas", "Mogi das Cruzes", "Estudantes"
+          ]
+        },
+        {
+          "id": "L12",
+          "nome": "Linha 12 - Safira",
+          "cor": "#1C146B",
+          "estacoes": [
+            "Brás", "Tatuapé", "Engenheiro Goulart", "USP Leste", 
+            "Comendador Ermelino", "São Miguel Paulista", "Jardim Helena-Vila Mara", 
+            "Itaaim Paulista", "Jardim Romano", "Engenheiro Manoel Feio", 
+            "Itaquaquecetuba", "Aracaré", "Calmon Viana"
+          ]
+        },
+        {
+          "id": "L13",
+          "nome": "Linha 13 - Jade",
+          "cor": "#009A44",
+          "estacoes": [
+            "Engenheiro Goulart", "Guarulhos-CECAP", "Aeroporto-Guarulhos"
+          ]
+        },
+        {
+          "id": "L1",
+          "nome": "Linha 1 - Azul",
+          "cor": "#00539F",
+          "estacoes": [
+            "Jabaquara", "Conceição", "São Judas", "Saúde", "Praça da Árvore", 
+            "Santa Cruz", "Vila Mariana", "Ana Rosa", "Paraíso", "Vergueiro", 
+            "São Joaquim", "Japão-Liberdade", "Sé", "São Bento", "Luz", 
+            "Tiradentes", "Armênia", "Portuguesa-Tietê", "Carandiru", 
+            "Santana", "Jardim São Paulo-Ayrton Senna", "Parada Inglesa", "Tucuruvi"
+          ]
+        },
+        {
+          "id": "L2",
+          "nome": "Linha 2 - Verde",
+          "cor": "#008060",
+          "estacoes": [
+            "Vila Madalena", "Santuário Nossa Senhora de Fátima-Sumaré", 
+            "Clínicas", "Consolação", "Trianon-Masp", "Brigadeiro", 
+            "Paraíso", "Ana Rosa", "Chácara Klabin", "Santos-Imigrantes", 
+            "Alto do Ipiranga", "Sacomã", "Tamanduateí", "Vila Prudente"
+          ]
+        },
+        {
+          "id": "L3",
+          "nome": "Linha 3 - Vermelha",
+          "cor": "#EE3E34",
+          "estacoes": [
+            "Palmeiras-Barra Funda", "Marechal Deodoro", "Santa Cecília", 
+            "República", "Anhangabaú", "Sé", "Pedro II", "Brás", 
+            "Bresser-Mooca", "Belém", "Tatuapé", "Carrão-Assaí Atacadista", 
+            "Penha-Besni", "Vila Matilde", "Guilhermina-Esperança", 
+            "Patriarca-Vila Ré", "Artur Alvim", "Corinthians-Itaquera"
+          ]
+        },
+        {
+          "id": "L4",
+          "nome": "Linha 4 - Amarela",
+          "cor": "#FED304",
+          "estacoes": [
+            "Luz", "República", "Higienópolis-Mackenzie", "Paulista", 
+            "Oscar Freire", "Fradique Coutinho", "Faria Lima", "Pinheiros", 
+            "Butantã", "São Paulo-Morumbi", "Vila Sônia"
+          ]
+        },
+        {
+          "id": "L5",
+          "nome": "Linha 5 - Lilás",
+          "cor": "#9B3894",
+          "estacoes": [
+            "Capão Redondo", "Campo Limpo", "Vila das Belezas", 
+            "Giovanni Gronchi", "Santo Amaro", "Largo Treze", "Brooklin", 
+            "Campo Belo", "Eucaliptos", "Moema", "AACD-Servidor", 
+            "Hospital São Paulo", "Santa Cruz", "Chácara Klabin"
+          ]
+        },
+        {
+          "id": "L7",
+          "nome": "Linha 7 - Rubi",
+          "cor": "#CA016B",
+          "estacoes": [
+            "Palmeiras-Barra Funda", "Água Branca", "Lapa", "Piqueri", 
+            "Pirituba", "Vila Clarice", "Jaraguá", "Vila Aurora", "Perus", 
+            "Caieiras", "Franco da Rocha", "Baltazar Fidélis", 
+            "Francisco Morato", "Botujuru", "Campo Limpo Paulista", 
+            "Várzea Paulista", "Jundiaí"
+          ]
+        },
+        {
+          "id": "L8",
+          "nome": "Linha 8 - Diamante",
+          "cor": "#97805F",
+          "estacoes": [
+            "Júlio Prestes", "Palmeiras-Barra Funda", "Lapa", 
+            "Domingos de Moraes", "Imperatriz Leopoldina", "Presidente Altino", 
+            "Osasco", "Comandante Sampaio", "Quitaúna", "General Miguel Costa", 
+            "Carapicuíba", "Santa Terezinha", "Antônio João", "Barueri", 
+            "Jardim Silveira", "Jardim Belval", "Arena Barueri", 
+            "Engenheiro Cardoso", "Sagrado Coração", "Itapevi"
+          ]
+        },
+        {
+          "id": "L9",
+          "nome": "Linha 9 - Esmeralda",
+          "cor": "#00A88F",
+          "estacoes": [
+            "Osasco", "Presidente Altino", "Ceasa", "Villa-Lobos-Jaguaré", 
+            "Cidade Universitária", "Pinheiros", "Hebraica-Rebouças", 
+            "Cidade Jardim", "Vila Olímpia", "Berrini", "Morumbi", 
+            "Granja Julieta", "João Dias", "Santo Amaro", "Socorro", 
+            "Jurubatuba", "Autódromo", "Primavera-Interlagos", "Grajaú", 
+            "Bruno Covas-Mendes-Vila Natal", "Varginha"
+          ]
+        },
+        {
+          "id": "L10",
+          "nome": "Linha 10 - Turquesa",
+          "cor": "#008287",
+          "estacoes": [
+            "Rio Grande da Serra", "Ribeirão Pires", "Guapituba", "Mauá", 
+            "Capuava", "Prefeito Celso Daniel-Santo André", "Prefeito Saladino", 
+            "Utinga", "São Caetano do Sul-Prefeito Walter Braido", 
+            "Tamanduateí", "Ipiranga", "Juventus-Mooca", "Brás", "Luz"
+          ]
+        },
+        {
+          "id": "L15",
+          "nome": "Linha 15 - Prata",
+          "cor": "#9E9E9E",
+          "estacoes": [
+            "Vila Prudente", "São Lucas", "Camilo Haddad", "Vila Tolstói", 
+            "Vila União", "Jardim Planalto", "Sapopemba", "Fazenda da Juta", 
+            "São Mateus", "Jardim Colonial"
+          ]
+        }
+      ]
+    };
 
+    // 2. Motor de rotas (Dijkstra)
+    function planejarViagem(origem, destino, malha) {
+      if (!origem || !destino) return { erro: "Origem e destino devem ser selecionados." };
+      const origTrim = origem.trim();
+      const destTrim = destino.trim();
+      if (origTrim === destTrim) return { erro: "A origem e o destino são iguais." };
+
+      const adj = {};
+      const estacaoParaNos = {};
+      const linhasInfo = {};
+
+      malha.linhas.forEach((linha) => {
+        linhasInfo[linha.id] = linha;
+        linha.estacoes.forEach((estacaoRaw, idx) => {
+          const estacao = estacaoRaw.trim();
+          const noAtual = `${estacao}__${linha.id}`;
+
+          if (!adj[noAtual]) adj[noAtual] = [];
+          if (!estacaoParaNos[estacao]) estacaoParaNos[estacao] = [];
+          estacaoParaNos[estacao].push({ no: noAtual, linhaId: linha.id });
+
+          if (idx > 0) {
+            const estAnterior = linha.estacoes[idx - 1].trim();
+            const noAnterior = `${estAnterior}__${linha.id}`;
+            adj[noAtual].push({ para: noAnterior, peso: 1, tipo: "TRECHO", linhaId: linha.id, estacao: estAnterior });
+            adj[noAnterior].push({ para: noAtual, peso: 1, tipo: "TRECHO", linhaId: linha.id, estacao: estacao });
+          }
+        });
+      });
+
+      // Baldeações automáticas
+      Object.keys(estacaoParaNos).forEach((estacao) => {
+        const nos = estacaoParaNos[estacao];
+        if (nos.length > 1) {
+          for (let i = 0; i < nos.length; i++) {
+            for (let j = 0; j < nos.length; j++) {
+              if (i !== j) {
+                adj[nos[i].no].push({
+                  para: nos[j].no,
+                  peso: 25,
+                  tipo: "BALDEACAO",
+                  linhaId: nos[j].linhaId,
+                  estacao: estacao
+                });
+              }
+            }
+          }
+        }
+      });
+
+      // Conexão Consolação <-> Paulista
+      function conectarEstacoesFisicas(est1, est2) {
+        const nos1 = estacaoParaNos[est1] || [];
+        const nos2 = estacaoParaNos[est2] || [];
+        nos1.forEach((n1) => {
+          nos2.forEach((n2) => {
+            adj[n1.no].push({ para: n2.no, peso: 25, tipo: "BALDEACAO", linhaId: n2.linhaId, estacao: `${est1} / ${est2}` });
+            adj[n2.no].push({ para: n1.no, peso: 25, tipo: "BALDEACAO", linhaId: n1.linhaId, estacao: `${est2} / ${est1}` });
+          });
+        });
+      }
+      conectarEstacoesFisicas("Consolação", "Paulista");
+
+      const nosOrigem = estacaoParaNos[origTrim];
+      const nosDestino = estacaoParaNos[destTrim];
+
+      if (!nosOrigem || !nosDestino) return { erro: "Estação não localizada na base." };
+
+      const dist = {};
+      const anterior = {};
+      const visitados = new Set();
+      const fila = [];
+
+      nosOrigem.forEach(({ no }) => {
+        dist[no] = 0;
+        fila.push({ no, custo: 0 });
+      });
+
+      while (fila.length > 0) {
+        fila.sort((a, b) => a.custo - b.custo);
+        const { no: u } = fila.shift();
+
+        if (visitados.has(u)) continue;
+        visitados.add(u);
+
+        const [estacaoAtual] = u.split("__");
+        if (estacaoAtual === destTrim) break;
+
+        (adj[u] || []).forEach((aresta) => {
+          const v = aresta.para;
+          const novoCusto = dist[u] + aresta.peso;
+          if (dist[v] === undefined || novoCusto < dist[v]) {
+            dist[v] = novoCusto;
+            anterior[v] = { de: u, aresta };
+            fila.push({ no: v, custo: novoCusto });
+          }
+        });
+      }
+
+      let melhorNoDestino = null;
+      let menorCusto = Infinity;
+      nosDestino.forEach(({ no }) => {
+        if (dist[no] !== undefined && dist[no] < menorCusto) {
+          menorCusto = dist[no];
+          melhorNoDestino = no;
+        }
+      });
+
+      if (!melhorNoDestino) return { erro: "Não foi possível calcular um trajeto entre as estações." };
+
+      const caminhoNos = [];
+      let atual = melhorNoDestino;
+      while (atual) {
+        caminhoNos.unshift(atual);
+        atual = anterior[atual] ? anterior[atual].de : null;
+      }
+
+      function obterSentido(linhaId, estOrigem, estProx) {
+        if (!linhasInfo[linhaId]) return "";
+        const ests = linhasInfo[linhaId].estacoes;
+        const idxOrig = ests.indexOf(estOrigem);
+        const idxP = ests.indexOf(estProx);
+        if (idxOrig === -1 || idxP === -1) return "";
+        return idxP > idxOrig ? ests[ests.length - 1] : ests[0];
+      }
+
+      const instrucoes = [];
+      let paradasTrechoAtual = 0;
+
+      const [estInicial, lInicial] = caminhoNos[0].split("__");
+      let sentidoInicial = "";
+      for (let i = 1; i < caminhoNos.length; i++) {
+        const [e, l] = caminhoNos[i].split("__");
+        if (l === lInicial && e !== estInicial) {
+          sentidoInicial = obterSentido(lInicial, estInicial, e);
+          break;
+        }
+      }
+
+      instrucoes.push({
+        acao: "EMBARQUE",
+        estacao: estInicial,
+        linha: (linhasInfo[lInicial] && linhasInfo[lInicial].nome) || lInicial,
+        corLinha: (linhasInfo[lInicial] && linhasInfo[lInicial].cor) || "#333",
+        sentido: sentidoInicial,
+      });
+
+      for (let i = 1; i < caminhoNos.length; i++) {
+        const [estAnt, linhaAnt] = caminhoNos[i - 1].split("__");
+        const [estAtu, linhaAtu] = caminhoNos[i].split("__");
+
+        if (linhaAnt === linhaAtu) {
+          paradasTrechoAtual++;
+        } else {
+          let sentidoNovo = "";
+          for (let j = i + 1; j < caminhoNos.length; j++) {
+            const [eSeg, lSeg] = caminhoNos[j].split("__");
+            if (lSeg === linhaAtu && eSeg !== estAtu) {
+              sentidoNovo = obterSentido(linhaAtu, estAtu, eSeg);
+              break;
+            }
+          }
+
+          instrucoes.push({
+            acao: "BALDEACAO",
+            estacao: estAnt === estAtu ? estAtu : `${estAnt} / ${estAtu}`,
+            descerDaLinha: (linhasInfo[linhaAnt] && linhasInfo[linhaAnt].nome) || linhaAnt,
+            pegarLinha: (linhasInfo[linhaAtu] && linhasInfo[linhaAtu].nome) || linhaAtu,
+            corLinha: (linhasInfo[linhaAtu] && linhasInfo[linhaAtu].cor) || "#333",
+            sentido: sentidoNovo,
+            estacoesPercorridasTrechoAnterior: paradasTrechoAtual,
+          });
+
+          paradasTrechoAtual = 0;
+        }
+      }
+
+      const [estFinal, lFinal] = caminhoNos[caminhoNos.length - 1].split("__");
+      instrucoes.push({
+        acao: "DESEMBARQUE",
+        estacao: estFinal,
+        linha: (linhasInfo[lFinal] && linhasInfo[lFinal].nome) || lFinal,
+        estacoesPercorridasTrechoAnterior: paradasTrechoAtual,
+      });
+
+      return {
+        origem: origTrim,
+        destino: destTrim,
+        totalBaldeacoes: instrucoes.filter((i) => i.acao === "BALDEACAO").length,
+        instrucoes,
+      };
+    }
+
+    // 3. Preenchimento do formulário
     function preencherSelect(selectElement, dados) {
       const linhasTriviaIds = ["L11", "L12", "L13"];
-
       const linhasTrivia = dados.linhas.filter(l => linhasTriviaIds.includes(l.id));
       const outrasLinhas = dados.linhas.filter(l => !linhasTriviaIds.includes(l.id));
 
@@ -108,114 +449,85 @@
       linhasTrivia.forEach(linha => {
         const grupo = document.createElement('optgroup');
         grupo.label = `${linha.nome} — Estações administradas pela Trivia Trens`;
-
         linha.estacoes.forEach(estacao => {
           const option = document.createElement('option');
           option.value = estacao.trim();
           option.textContent = estacao.trim();
           grupo.appendChild(option);
         });
-
         selectElement.appendChild(grupo);
       });
 
       outrasLinhas.forEach(linha => {
         const grupo = document.createElement('optgroup');
         grupo.label = linha.nome;
-
         linha.estacoes.forEach(estacao => {
           const option = document.createElement('option');
           option.value = estacao.trim();
           option.textContent = estacao.trim();
           grupo.appendChild(option);
         });
-
         selectElement.appendChild(grupo);
       });
     }
 
-    fetch('malha.json')
-      .then(res => {
-        if (!res.ok) throw new Error(`HTTP status ${res.status}`);
-        return res.json();
-      })
-      .then(dados => {
-        malhaDados = dados;
-        const selOrigem = document.getElementById('origem');
-        const selDestino = document.getElementById('destino');
+    const selOrigem = document.getElementById('origem');
+    const selDestino = document.getElementById('destino');
+    preencherSelect(selOrigem, malhaDados);
+    preencherSelect(selDestino, malhaDados);
 
-        preencherSelect(selOrigem, dados);
-        preencherSelect(selDestino, dados);
-      })
-      .catch(err => {
-        document.getElementById('resultado').innerHTML = 
-          `<p style="color: red;"><b>Erro ao carregar o arquivo malha.json:</b> ${err.message}. Verifique se o arquivo está na mesma pasta do index.html.</p>`;
-      });
-
+    // 4. Ação do botão
     document.getElementById('btnBuscar').addEventListener('click', () => {
-      const selOrigem = document.getElementById('origem');
-      const selDestino = document.getElementById('destino');
       const container = document.getElementById('resultado');
-
       const origem = selOrigem.value;
       const destino = selDestino.value;
-
-      if (!malhaDados) {
-        container.innerHTML = '<p style="color: red;">Aguarde, os dados da malha ainda estão sendo carregados...</p>';
-        return;
-      }
 
       if (!origem || !destino) {
         container.innerHTML = '<p style="color: #c00;">Por favor, selecione uma estação de origem e uma de destino.</p>';
         return;
       }
 
-      try {
-        const rota = planejarViagem(origem, destino, malhaDados);
-        container.innerHTML = '';
+      const rota = planejarViagem(origem, destino, malhaDados);
+      container.innerHTML = '';
 
-        if (rota.erro) {
-          container.innerHTML = `<p style="color: red;">${rota.erro}</p>`;
-          return;
+      if (rota.erro) {
+        container.innerHTML = `<p style="color: red;">${rota.erro}</p>`;
+        return;
+      }
+
+      const resumoDiv = document.createElement('div');
+      resumoDiv.className = 'resumo';
+      const baldeacoesTexto = rota.totalBaldeacoes === 0 
+        ? 'Viagem direta (sem baldeações)' 
+        : `${rota.totalBaldeacoes} baldeação(ões)`;
+      resumoDiv.textContent = `${origem} ➔ ${destino} (${baldeacoesTexto})`;
+      container.appendChild(resumoDiv);
+
+      rota.instrucoes.forEach(passo => {
+        const div = document.createElement('div');
+        div.className = 'passo';
+        div.style.borderColor = passo.corLinha || '#333';
+
+        if (passo.acao === 'EMBARQUE') {
+          div.innerHTML = `
+            <div><strong>Embarque:</strong> Estação <b>${passo.estacao}</b> na <b>${passo.linha}</b></div>
+            ${passo.sentido ? `<div class="badge-sentido">Sentido ${passo.sentido}</div>` : ''}
+          `;
+        } else if (passo.acao === 'BALDEACAO') {
+          div.innerHTML = `
+            <div><strong>Transferência:</strong> Em <b>${passo.estacao}</b>, desça da <i>${passo.descerDaLinha}</i> e apanhe a <b>${passo.pegarLinha}</b></div>
+            ${passo.sentido ? `<div class="badge-sentido">Sentido ${passo.sentido}</div>` : ''}
+            ${passo.estacoesPercorridasTrechoAnterior ? `<div class="paradas-info">(${passo.estacoesPercorridasTrechoAnterior} estações no trecho anterior)</div>` : ''}
+          `;
+        } else if (passo.acao === 'DESEMBARQUE') {
+          div.innerHTML = `
+            <div><strong>Desembarque:</strong> Estação terminal <b>${passo.estacao}</b> (${passo.linha})</div>
+            ${passo.estacoesPercorridasTrechoAnterior ? `<div class="paradas-info">(${passo.estacoesPercorridasTrechoAnterior} estações no último trecho)</div>` : ''}
+          `;
         }
 
-        const resumoDiv = document.createElement('div');
-        resumoDiv.className = 'resumo';
-        const baldeacoesTexto = rota.totalBaldeacoes === 0 
-          ? 'Viagem direta (sem baldeações)' 
-          : `${rota.totalBaldeacoes} baldeação(ões)`;
-        resumoDiv.textContent = `${origem} ➔ ${destino} (${baldeacoesTexto})`;
-        container.appendChild(resumoDiv);
-
-        rota.instrucoes.forEach(passo => {
-          const div = document.createElement('div');
-          div.className = 'passo';
-          div.style.borderColor = passo.corLinha || '#333';
-
-          if (passo.acao === 'EMBARQUE') {
-            div.innerHTML = `
-              <div><strong>Embarque:</strong> Estação <b>${passo.estacao}</b> na <b>${passo.linha}</b></div>
-              ${passo.sentido ? `<div class="badge-sentido">Sentido ${passo.sentido}</div>` : ''}
-            `;
-          } else if (passo.acao === 'BALDEACAO') {
-            div.innerHTML = `
-              <div><strong>Transferência:</strong> Em <b>${passo.estacao}</b>, desça da <i>${passo.descerDaLinha}</i> e pegue a <b>${passo.pegarLinha}</b></div>
-              ${passo.sentido ? `<div class="badge-sentido">Sentido ${passo.sentido}</div>` : ''}
-              ${passo.estacoesPercorridasTrechoAnterior ? `<div class="paradas-info">(${passo.estacoesPercorridasTrechoAnterior} estações no trecho anterior)</div>` : ''}
-            `;
-          } else if (passo.acao === 'DESEMBARQUE') {
-            div.innerHTML = `
-              <div><strong>Desembarque:</strong> Estação final <b>${passo.estacao}</b> (${passo.linha})</div>
-              ${passo.estacoesPercorridasTrechoAnterior ? `<div class="paradas-info">(${passo.estacoesPercorridasTrechoAnterior} estações no último trecho)</div>` : ''}
-            `;
-          }
-
-          container.appendChild(div);
-        });
-      } catch (e) {
-        console.error(e);
-        container.innerHTML = `<p style="color: red;">Erro ao processar a rota: ${e.message}</p>`;
-      }
+        container.appendChild(div);
+      });
     });
   </script>
 </body>
