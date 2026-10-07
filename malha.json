@@ -1,24 +1,54 @@
 {
   "linhas": [
     {
-      "id": "L10",
-      "nome": "Linha 10 - Turquesa",
-      "cor": "#008287",
+      "id": "L1",
+      "nome": "Linha 1 - Azul",
+      "cor": "#00539F",
       "estacoes": [
-        "Rio Grande da Serra",
-        "Ribeirão Pires",
-        "Guapituba",
-        "Mauá",
-        "Capuava",
-        "Prefeito Celso Daniel - Santo André",
-        "Prefeito Saladino",
-        "Utinga",
-        "São Caetano do Sul",
+        "Jabaquara",
+        "Conceição",
+        "São Judas",
+        "Saúde",
+        "Praça da Árvore",
+        "Santa Cruz",
+        "Vila Mariana",
+        "Ana Rosa",
+        "Paraíso",
+        "Vergueiro",
+        "São Joaquim",
+        "Japão-Liberdade",
+        "Sé",
+        "São Bento",
+        "Luz",
+        "Tiradentes",
+        "Armênia",
+        "Portuguesa-Tietê",
+        "Carandiru",
+        "Santana",
+        "Jardim São Paulo-Ayrton Senna",
+        "Parada Inglesa",
+        "Tucuruvi"
+      ]
+    },
+    {
+      "id": "L2",
+      "nome": "Linha 2 - Verde",
+      "cor": "#008060",
+      "estacoes": [
+        "Vila Madalena",
+        "Sumaré - Santuário Nossa Senhora de Fátima",
+        "Clínicas",
+        "Consolação",
+        "Trianon-Masp",
+        "Brigadeiro",
+        "Paraíso",
+        "Ana Rosa",
+        "Chácara Klabin",
+        "Santos-Imigrantes",
+        "Alto do Ipiranga",
+        "Sacomã",
         "Tamanduateí",
-        "Ipiranga",
-        "Juventus-Mooca",
-        "Brás",
-        "Luz"
+        "Vila Prudente"
       ]
     },
     {
@@ -26,12 +56,87 @@
       "nome": "Linha 3 - Vermelha",
       "cor": "#EE3E34",
       "estacoes": [
-        "Corinthians-Itaquera",
-        "Tatuapé",
-        "Brás",
-        "Sé",
+        "Palmeiras-Barra Funda",
+        "Marechal Deodoro",
+        "Santa Cecília",
         "República",
-        "Palmeiras-Barra Funda"
+        "Anhangabaú",
+        "Sé",
+        "Pedro II",
+        "Brás",
+        "Bresser-Mooca",
+        "Belém",
+        "Tatuapé",
+        "Carrão-Assaí Atacadista",
+        "Penha-Besni",
+        "Vila Matilde",
+        "Guilhermina-Esperança",
+        "Patriarca-Vila Ré",
+        "Artur Alvim",
+        "Corinthians-Itaquera"
+      ]
+    },
+    {
+      "id": "L4",
+      "nome": "Linha 4 - Amarela",
+      "cor": "#FED304",
+      "estacoes": [
+        "Luz",
+        "República",
+        "Higienópolis-Mackenzie",
+        "Paulista",
+        "Oscar Freire",
+        "Fradique Coutinho",
+        "Faria Lima",
+        "Pinheiros",
+        "Butantã",
+        "São Paulo-Morumbi",
+        "Vila Sônia"
+      ]
+    },
+    {
+      "id": "L5",
+      "nome": "Linha 5 - Lilás",
+      "cor": "#9B3894",
+      "estacoes": [
+        "Capão Redondo",
+        "Campo Limpo",
+        "Vila das Belezas",
+        "Giovanni Gronchi",
+        "Santo Amaro",
+        "Largo Treze",
+        "Brooklin",
+        "Campo Belo",
+        "Eucaliptos",
+        "Moema",
+        "AACD-Servidor",
+        "Hospital São Paulo",
+        "Santa Cruz",
+        "Chácara Klabin"
+      ]
+    },
+    {
+      "id": "L7",
+      "nome": "Linha 7 - Rubi",
+      "cor": "#CA016B",
+      "estacoes": [
+        "Palmeiras-Barra Funda",
+        "Água Branca",
+        "Lapa",
+        "Piqueri",
+        "Pirituba",
+        "Vila Clarice",
+        "Jaraguá",
+        "Vila Aurora",
+        "Perus",
+        "Caieiras",
+        "Franco da Rocha",
+        "Baltazar Fidélis",
+        "Francisco Morato",
+        "Botujuru",
+        "Campo Limpo Paulista",
+        "Várzea Paulista",
+        "Jundiaí"
       ]
     },
     {
@@ -53,24 +158,15 @@
         "Santa Terezinha",
         "Antônio João",
         "Barueri",
-        "Jardim Silveira",
         "Jardim Belval",
-        "Arena Barueri",
-        "Engenheiro Cardoso",
+        "Jardim Silveira",
+        "Jandira",
         "Sagrado Coração",
-        "Itapevi"
-      ]
-    },
-    {
-      "id": "L4",
-      "nome": "Linha 4 - Amarela",
-      "cor": "#FED304",
-      "estacoes": [
-        "Luz",
-        "República",
-        "Paulista",
-        "Pinheiros",
-        "Vila Sônia"
+        "Engenheiro Cardoso",
+        "Itapevi",
+        "Santa Rita",
+        "Ambuitá",
+        "Amador Bueno"
       ]
     },
     {
@@ -80,9 +176,119 @@
       "estacoes": [
         "Osasco",
         "Presidente Altino",
+        "Ceasa",
+        "Villa-Lobos-Jaguaré",
+        "Cidade Universitária",
         "Pinheiros",
+        "Hebraica-Rebouças",
+        "Cidade Jardim",
+        "Vila Olímpia",
+        "Berrini",
+        "Morumbi",
+        "Granja Julieta",
+        "João Dias",
         "Santo Amaro",
-        "Mendes-Vila Natal"
+        "Socorro",
+        "Jurubatuba",
+        "Autódromo",
+        "Primavera-Interlagos",
+        "Grajaú",
+        "Bruno Covas-Mendes-Vila Natal",
+        "Varginha"
+      ]
+    },
+    {
+      "id": "L10",
+      "nome": "Linha 10 - Turquesa",
+      "cor": "#008287",
+      "estacoes": [
+        "Rio Grande da Serra",
+        "Ribeirão Pires",
+        "Guapituba",
+        "Mauá",
+        "Capuava",
+        "Prefeito Celso Daniel-Santo André",
+        "Prefeito Saladino",
+        "Utinga",
+        "São Caetano do Sul-Prefeito Walter Braido",
+        "Tamanduateí",
+        "Ipiranga",
+        "Juventus-Mooca",
+        "Brás",
+        "Luz",
+        "Palmeiras Barra-Funda"
+      ]
+    },
+    {
+      "id": "L11",
+      "nome": "Linha 11 - Coral",
+      "cor": "#F04E23",
+      "estacoes": [
+        "Palmeiras Barra-Funda",
+        "Luz",
+        "Brás",
+        "Tatuapé",
+        "Corinthians-Itaquera",
+        "Dom Bosco",
+        "José Bonifácio",
+        "Guaianases",
+        "Antônio Gianetti Neto",
+        "Ferraz de Vasconcelos",
+        "Poá",
+        "Calmon Viana",
+        "Suzano",
+        "Jundiapeba",
+        "Brás Cubas",
+        "Mogi das Cruzes",
+        "Estudantes"
+      ]
+    },
+    {
+      "id": "L12",
+      "nome": "Linha 12 - Safira",
+      "cor": "#1C146B",
+      "estacoes": [
+        "Brás",
+        "Tatuapé",
+        "Engenheiro Goulart",
+        "USP Leste",
+        "Comendador Ermelino",
+        "São Miguel Paulista",
+        "Jardim Helena-Vila Mara",
+        "Itaim Paulista",
+        "Jardim Romano",
+        "Engenheiro Manoel Feio",
+        "Itaquaquecetuba",
+        "Aracaré",
+        "Calmon Viana"
+      ]
+    },
+    {
+      "id": "L13",
+      "nome": "Linha 13 - Jade",
+      "cor": "#009A44",
+      "estacoes": [
+        "Engenheiro Goulart",
+        "Guarulhos-CECAP",
+        "Aeroporto-Guarulhos"
+      ]
+    },
+    {
+      "id": "L15",
+      "nome": "Linha 15 - Prata",
+      "cor": "#9E9E9E",
+      "estacoes": [
+        "Vila Prudente",
+        "Oratório",
+        "São Lucas",
+        "Camilo Haddad",
+        "Vila Tolstói",
+        "Vila União",
+        "Jardim Planalto",
+        "Sapopemba",
+        "Fazenda da Juta",
+        "São Mateus",
+        "Jardim Colonial"
       ]
     }
   ]
