@@ -15,7 +15,7 @@
     h2 { margin-bottom: 24px; color: #1a1a1a; font-weight: 600; }
     .campo { margin-bottom: 18px; }
     label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px; color: #444; }
-    select, button { 
+    input, button { 
       width: 100%; 
       padding: 12px; 
       font-size: 15px; 
@@ -23,9 +23,14 @@
       border: 1px solid #ccc; 
       box-sizing: border-box;
     }
-    select { background-color: #fff; }
-    optgroup { font-weight: bold; font-size: 13px; }
-    option { font-weight: normal; font-size: 14px; padding: 4px; }
+    input { 
+      background-color: #fff; 
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input:focus {
+      border-color: #008287;
+    }
     button { 
       background-color: #008287; 
       color: white; 
@@ -52,7 +57,7 @@
       margin-bottom: 24px;
     }
 
-    /* Linha do tempo visual alinhada */
+    /* Linha do tempo visual */
     .timeline {
       display: flex;
       flex-direction: column;
@@ -98,35 +103,50 @@
 
   <div class="campo">
     <label for="origem">Estação de Origem:</label>
-    <select id="origem" disabled>
-      <option value="" disabled selected>Carregando estações...</option>
-    </select>
+    <input 
+      type="text" 
+      id="origem" 
+      list="lista-estacoes" 
+      placeholder="Digite ou selecione a estação de origem..." 
+      disabled 
+      autocomplete="off"
+    >
   </div>
 
   <div class="campo">
     <label for="destino">Estação de Destino:</label>
-    <select id="destino" disabled>
-      <option value="" disabled selected>Carregando estações...</option>
-    </select>
+    <input 
+      type="text" 
+      id="destino" 
+      list="lista-estacoes" 
+      placeholder="Digite ou selecione a estação de destino..." 
+      disabled 
+      autocomplete="off"
+    >
   </div>
+
+  <!-- Datalist compartilhado que alimenta os dois campos com busca e autocomplete -->
+  <datalist id="lista-estacoes"></datalist>
 
   <button id="btnBuscar" disabled>Carregando malha...</button>
 
   <div class="resultado-container" id="containerResultado">
-    <div style="color: #666;">Escolha a origem e o destino para visualizar as instruções.</div>
+    <div style="color: #666;">Digite ou escolha a origem e o destino para visualizar as instruções de viagem.</div>
   </div>
 
   <script src="roteador.js"></script>
 
   <script>
     let malhaDados = null;
-    const selOrigem = document.getElementById('origem');
-    const selDestino = document.getElementById('destino');
+    const inpOrigem = document.getElementById('origem');
+    const inpDestino = document.getElementById('destino');
+    const dataList = document.getElementById('lista-estacoes');
     const btnBuscar = document.getElementById('btnBuscar');
     const containerResultado = document.getElementById('containerResultado');
 
-    function preencherSelect(selectElement, dados) {
-      selectElement.innerHTML = '<option value="" disabled selected>Selecione uma estação...</option>';
+    // Popula o datalist priorizando as linhas da Trivia Trens
+    function preencherDatalist(dlElement, dados) {
+      dlElement.innerHTML = '';
       const linhasTriviaIds = ["L11", "L12", "L13"];
 
       const linhasTrivia = dados.linhas.filter(l => linhasTriviaIds.includes(l.id));
@@ -134,28 +154,24 @@
 
       linhasTrivia.sort((a, b) => linhasTriviaIds.indexOf(a.id) - linhasTriviaIds.indexOf(b.id));
 
+      // 1. Estações da Trivia Trens no topo
       linhasTrivia.forEach(linha => {
-        const grupo = document.createElement('optgroup');
-        grupo.label = `${linha.nome} — Estações administradas pela Trivia Trens`;
         linha.estacoes.forEach(estacao => {
-          const option = document.createElement('option');
-          option.value = estacao.trim();
-          option.textContent = estacao.trim();
-          grupo.appendChild(option);
+          const opt = document.createElement('option');
+          opt.value = estacao.trim();
+          opt.label = `${linha.nome} (Trivia Trens)`;
+          dlElement.appendChild(opt);
         });
-        selectElement.appendChild(grupo);
       });
 
+      // 2. Demais estações da malha integrada
       outrasLinhas.forEach(linha => {
-        const grupo = document.createElement('optgroup');
-        grupo.label = linha.nome;
         linha.estacoes.forEach(estacao => {
-          const option = document.createElement('option');
-          option.value = estacao.trim();
-          option.textContent = estacao.trim();
-          grupo.appendChild(option);
+          const opt = document.createElement('option');
+          opt.value = estacao.trim();
+          opt.label = linha.nome;
+          dlElement.appendChild(opt);
         });
-        selectElement.appendChild(grupo);
       });
     }
 
@@ -166,11 +182,10 @@
       })
       .then(dados => {
         malhaDados = dados;
-        preencherSelect(selOrigem, malhaDados);
-        preencherSelect(selDestino, malhaDados);
+        preencherDatalist(dataList, malhaDados);
 
-        selOrigem.disabled = false;
-        selDestino.disabled = false;
+        inpOrigem.disabled = false;
+        inpDestino.disabled = false;
         btnBuscar.disabled = false;
         btnBuscar.textContent = "Calcular Rota";
       })
@@ -180,11 +195,16 @@
       });
 
     btnBuscar.addEventListener('click', () => {
-      const origem = selOrigem.value;
-      const destino = selDestino.value;
+      const origem = inpOrigem.value.trim();
+      const destino = inpDestino.value.trim();
 
       if (!origem || !destino) {
-        containerResultado.innerHTML = '<p style="color: #c00;">Por favor, selecione uma estação de origem e uma de destino.</p>';
+        containerResultado.innerHTML = '<p style="color: #c00;">Por favor, digite ou selecione a estação de origem e de destino.</p>';
+        return;
+      }
+
+      if (typeof planejarViagem !== 'function') {
+        containerResultado.innerHTML = '<p style="color: red;">O arquivo <code>roteador.js</code> não foi carregado corretamente.</p>';
         return;
       }
 
@@ -199,7 +219,7 @@
       const prim = rota.instrucoes[0];
       const ult = rota.instrucoes[rota.instrucoes.length - 1];
 
-      // Cabeçalho
+      // Cabeçalho da viagem
       const headerDiv = document.createElement('div');
       headerDiv.className = 'titulo-viagem';
       headerDiv.innerHTML = `${origem} (${prim.linha}) ➔ ${destino} (${ult.linha})`;
@@ -235,7 +255,7 @@
           timeline.appendChild(item);
 
         } else if (passo.acao === 'BALDEACAO') {
-          // 1. Desembarque na estação de baldeação
+          // Desembarque na estação de integração
           const itemDesembarque = document.createElement('div');
           itemDesembarque.className = 'timeline-item';
           itemDesembarque.innerHTML = `
@@ -252,7 +272,7 @@
           // Atualiza para a cor da linha seguinte
           corAtual = passo.corLinha;
 
-          // 2. Transferência para a nova linha
+          // Transferência
           const itemTransferencia = document.createElement('div');
           itemTransferencia.className = 'timeline-item';
           itemTransferencia.innerHTML = `
